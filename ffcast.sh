@@ -3,6 +3,7 @@
 # FFcast, http://github.com/chilicuil/ffcast
 # Copyright (C) 2011  lolilolicon  <lolilolicon@gmail.com>
 # Copyright (C) 2014  Javier Lopez <m@javier.io>
+# Copyright (C) 2016  Josh Bradley <https://github.com/jlblcc>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,6 +23,18 @@ modulus="2"; frame="0"; verbosity="0"
 
 #---
 # Functions
+
+# Delay before starting
+DELAY=5
+
+# Sound notification to let one know when recording is about to start (and ends)
+_beep() {
+    paplay /usr/share/sounds/freedesktop/stereo/service-login.oga &
+}
+_beep_out() {
+    paplay /usr/share/sounds/freedesktop/stereo/service-logout.oga &
+}
+
 
 __msg() {
     __msg_var_prefix="${1}"
@@ -254,7 +267,16 @@ elif ! command -v "xwininfo" >/dev/null; then
     _error "xwininfo not found!, $ sudo apt-get install x11-utils"
 fi
 
-_notify "[+] Screencast" "in 3.., 2.., 1.., smile =)!"; sleep 3
+_beep
+_notify "[+] Screencast" "Delaying $DELAY seconds. Get Ready..."
+i=0
+while [ $i -lt $DELAY ]
+do
+    echo $i
+    sleep 1
+    true $((i=i+1))
+done
+_beep
 kill "$(pgrep "notify-osd")" >/dev/null 2>/dev/null; sleep .5
 
 #---
@@ -414,4 +436,5 @@ else
     [ -f "${cast_file}" ] && _notify "[+] Done" "${cast_file}" || _notify "[-] Error" "re-run ffcast with -vvv and review the output"
 fi
 
+_beep_out
 # vim: set ts=8 sw=4 tw=0 ft=sh : 
